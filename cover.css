@@ -2,6 +2,10 @@
  * Globals
  */
 
+body {
+  width: 100%;
+}
+
 /* Links */
 a,
 a:focus,
@@ -9,10 +13,10 @@ a:hover {
   color: #fff;
 }
 
-/* Custom default button */
-.btn-secondary,
-.btn-secondary:hover,
-.btn-secondary:focus {
+/* Custom default button (hero section only) */
+.video-hero .btn-secondary,
+.video-hero .btn-secondary:hover,
+.video-hero .btn-secondary:focus {
   color: #333;
   text-shadow: none !important; /* Prevent inheritance from `body` */
   background-color: #fff;
@@ -152,7 +156,7 @@ body {
 .nav-masthead .nav-link.active { border-color: rgba(255,255,255,0.6); }
 
 /* Títulos y textos del héroe */
-.cover-heading, .lead-hero, .btn-secondary {
+.cover-heading, .lead-hero, .video-hero .btn-secondary {
   text-shadow: 0 2px 6px rgba(0,0,0,0.45);
 }
 
