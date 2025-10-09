@@ -14,7 +14,7 @@ a:hover {
 .btn-secondary:hover,
 .btn-secondary:focus {
   color: #333;
-  text-shadow: none; /* Prevent inheritance from `body` */
+  text-shadow: none !important; /* Prevent inheritance from `body` */
   background-color: #fff;
   border: .05rem solid #fff;
 }
@@ -103,7 +103,6 @@ body {
   padding: .75rem 1.25rem;
   font-weight: 700;
 }
-
 
 /*
  * Footer
