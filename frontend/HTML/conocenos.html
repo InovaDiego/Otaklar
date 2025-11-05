@@ -3,11 +3,131 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conócenos | Llaveros UCQ</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Conócenos | Otaklar UCQ</title>
+
+  <style>
+    /* ==== ESTILOS GENERALES ==== */
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+
+    header {
+      background-color: #1e1e1e;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 1.8em;
+      letter-spacing: 1px;
+    }
+
+    nav {
+      background-color: #333;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 20px;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #00c6ff;
+    }
+
+    main {
+      padding: 40px 0;
+    }
+
+    h2 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 30px;
+      font-size: 2em;
+    }
+
+    /* ==== SECCIÓN EQUIPO ==== */
+    .equipo {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 300px;
+      text-align: center;
+      padding: 25px 20px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .card img {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid #00c6ff;
+    }
+
+    .card h3 {
+      font-size: 1.2em;
+      color: #111;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 0.95em;
+      color: #555;
+      margin-bottom: 20px;
+    }
+
+    .btn-perfil {
+      display: inline-block;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      color: #fff;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-perfil:hover {
+      background: linear-gradient(90deg, #0072ff, #00c6ff);
+      transform: scale(1.05);
+    }
+
+    footer {
+      background-color: #1e1e1e;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9em;
+      margin-top: 40px;
+    }
+  </style>
 </head>
+
 <body>
-  <header>Llaveros UCQ</header>
+  <header>Otaklar UCQ</header>
 
   <nav>
     <a href="index.html">Inicio</a>
@@ -17,12 +137,12 @@
   </nav>
 
   <main>
-    <h2 style="text-align:center; margin:20px 0;">Nuestro Equipo</h2>
+    <h2>Nuestro Equipo</h2>
 
     <div class="equipo">
 
       <div class="card">
-        <img src="../../multimedia/index/img/" alt="Carlos González">
+        <img src="../../multimedia/index/img/Carlos.jpg" alt="Carlos González">
         <h3>Carlos González</h3>
         <p>Desarrollador creativo con enfoque en soluciones digitales.</p>
         <a class="btn-perfil" href="https://curriculumticki.netlify.app/">Ver perfil</a>
@@ -31,16 +151,14 @@
       <div class="card">
         <img src="../../multimedia/index/img/imagen_perfil_diego.jpg" alt="Diego Castillo">
         <h3>Diego Castillo Salazar</h3>
-        <p>Profesional con experiencia en gestión de operaciones y desarrollo de equipos, en transición hacia la Ingeniería en Software en Ingeniería de Datos..</p>
+        <p>Profesional con experiencia en gestión de operaciones y desarrollo de equipos, en transición hacia la Ingeniería en Software en Ingeniería de Datos.</p>
         <a class="btn-perfil" href="https://cvdiegocastillo.netlify.app/">Ver perfil</a>
       </div>
 
       <div class="card">
         <img src="../../multimedia/index/img/juan-pablo.jpeg" alt="Juan Pablo Ramos">
         <h3>Juan Pablo Ramos</h3>
-        <p>Estudiante de Ciencias de la Computación en la Universidad Cuauhtémoc. Pasión por
-          el desarrollo de software, cloud computing y Linux. Destaco por pensar
-          analíticamente.</p>
+        <p>Estudiante de Ciencias de la Computación en la Universidad Cuauhtémoc. Pasión por el desarrollo de software, cloud computing y Linux.</p>
         <a class="btn-perfil" href="https://jpablo.me">Ver perfil</a>
       </div>
 
@@ -69,9 +187,8 @@
   </main>
 
   <footer>
-    © 2025 Otlakar
+    © 2025 Otaklar
   </footer>
 
-  <!-- <script src="script.js"></script>-->
 </body>
 </html>
