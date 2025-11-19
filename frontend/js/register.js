@@ -90,7 +90,7 @@ pwd.addEventListener('input', () => {
     }
 
     if (!validPassword(pwd_val)) {
-        pwd.setCustomValidity("La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un dígito, al menos un carácter especial y tener una longitud de entre 12 y 20 caracteres.")
+        pwd.setCustomValidity("La contraseña debe contener al menos una letra mayúscula, una letra minúscula, un dígito, al menos un carácter especial y tener una longitud de entre 8 y 20 caracteres.")
         pwd.reportValidity();
     } else {
         pwd.setCustomValidity("");
