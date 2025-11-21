@@ -1,17 +1,4 @@
 //definitions
-async function checkEmail(email) {
-    const res = await fetch("http://localhost:3030/api/users");
-    const data = await res.json();
-    let result = false;
-    for (let user of data) {
-        if (user.email === email) {
-            result = true;
-        }
-    }
-    console.log(result);
-    return result;
-}
-
 function validPassword(pwd) {
     const lengthOK = pwd.length >= 8 && pwd.length <= 20;
 
@@ -57,7 +44,7 @@ name_field.addEventListener('input', () => {
     }
 });
 
-email.addEventListener('input', async () => {
+email.addEventListener('input', () => {
     let mail_val = email.value;
     let check_space = mail_val;
     mail_val = mail_val.trim();
@@ -68,9 +55,6 @@ email.addEventListener('input', async () => {
         email.reportValidity();
     } else if (!(/^[a-zA-Z0-9._]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(mail_val))) {
         email.setCustomValidity("Email invalido.")
-        email.reportValidity();
-    } else if (await checkEmail(mail_val)) { 
-        email.setCustomValidity("El correo ya existe.");
         email.reportValidity();
     } else {
         email.setCustomValidity("");
