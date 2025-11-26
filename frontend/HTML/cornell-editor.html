@@ -278,7 +278,7 @@ https://cdn.rawgit.com/kensnyder/quill-image-resize-module/3411c9a7/image-resize
     </script>
     <script>
         //This script is for uploading the contents of the front-end cornell notes template to the backend
-        const API_BASE = "/api";
+        const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
         const save = document.getElementById('save-btn');
         const backBtn = document.getElementById('back-btn');
         const docTitle = document.getElementById('doc-title');
@@ -305,7 +305,7 @@ https://cdn.rawgit.com/kensnyder/quill-image-resize-module/3411c9a7/image-resize
             if (!docId) return;
 
             try {
-                const res = await fetch(`${API_BASE}/documents/${docId}`, { credentials: 'include' });
+                const res = await fetch(`${API_BASE}/api/documents/${docId}`, { credentials: 'include' });
                 if (res.status === 401) {
                     window.location.href = './login.html';
                     return;
@@ -330,7 +330,7 @@ https://cdn.rawgit.com/kensnyder/quill-image-resize-module/3411c9a7/image-resize
             const contentB = quill2.getContents();
 
             const isNew = !documentID;
-            const url = isNew ? `${API_BASE}/documents` : `${API_BASE}/api/documents/${documentID}`;
+            const url = isNew ? `${API_BASE}/api/documents` : `${API_BASE}/api/documents/${documentID}`;
             const method = isNew ? 'POST' : 'PUT';
 
             try {

@@ -59,7 +59,7 @@ function buildCard(doc) {
 
 async function loadDocuments() {
   try {
-    const res = await fetch(`${API_BASE}/documents`, { credentials: 'include', cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/api/documents`, { credentials: 'include', cache: 'no-store' });
 
     if (res.status === 401) {
       window.location.href = './login.html';
