@@ -6,6 +6,11 @@ const path = require('path');
 
 const app = express();
 
+if (!process.env.DATABASE_URL) {
+  // Fail fast in case the env var is missing in the deployed environment
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -20,13 +25,17 @@ async function runQuery(queryText, params = []) {
 }
 
 
-const FRONTEND_ORIGIN = "https://otaklar-frontend-tt6ru.ondigitalocean.app";
+const FRONTEND_ORIGIN =
+  process.env.FRONTEND_ORIGIN ||
+  "https://otaklar-frontend-tt6ru.ondigitalocean.app";
+const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(cors({
   origin: FRONTEND_ORIGIN,
   credentials: true,
 }));
 
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(
   session({
@@ -35,8 +44,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: 'none',
-      secure: true,
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
       maxAge: 1000 * 60 * 60,
     },
   }),
