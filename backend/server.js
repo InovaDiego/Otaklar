@@ -6,13 +6,13 @@ const path = require('path');
 
 const app = express();
 
-if (!process.env.DATABASE_URL) {
-  // Fail fast in case the env var is missing in the deployed environment
-  throw new Error('DATABASE_URL environment variable is not set');
-}
+// Use env var when provided; fall back to the public DB endpoint shared by the user.
+const DATABASE_URL =
+  process.env.DATABASE_URL ||
+  'postgres://doadmin:AVNS_ptHeQ30vvQ1B37xrsCb@otaklar-db-do-user-22829578-0.g.db.ondigitalocean.com:25060/defaultdb?sslmode=require';
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: DATABASE_URL,
   ssl: {
     require: true,
     rejectUnauthorized: false
