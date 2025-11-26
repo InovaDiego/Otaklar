@@ -12,12 +12,17 @@ if (!process.env.DATABASE_URL) {
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
+// If PG_SSL_CA is provided, validate against that CA; otherwise allow self-signed.
+const sslConfig = process.env.PG_SSL_CA
+  ? {
+      ca: process.env.PG_SSL_CA.replace(/\\n/g, '\n'),
+      rejectUnauthorized: true,
+    }
+  : { rejectUnauthorized: false };
+
 const pool = new Pool({
   connectionString: DATABASE_URL,
-  // DigitalOcean managed Postgres presents a self-signed cert; disable verification.
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: sslConfig,
 });
 
 async function runQuery(queryText, params = []) {
