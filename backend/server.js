@@ -16,7 +16,6 @@ const pool = new Pool({
   connectionString: DATABASE_URL,
   // DigitalOcean managed Postgres presents a self-signed cert; disable verification.
   ssl: {
-    ca: process.env.PG_SSL_CA,
     rejectUnauthorized: false,
   },
 });
