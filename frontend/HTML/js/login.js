@@ -1,4 +1,4 @@
-const API_BASE = "/api";
+const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
 const form = document.querySelector('.register-card');
 const lgAlert = document.getElementById('login-alert');
 
@@ -8,7 +8,7 @@ form.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
 
   try {
-    const res = await fetch(`${API_BASE}/login`, {
+    const res = await fetch(`${API_BASE}/api/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',

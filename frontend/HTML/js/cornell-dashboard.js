@@ -1,4 +1,4 @@
-const API_BASE = "/api";
+const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
 const grid = document.getElementById('notes-grid');
 const addNoteBtn = document.getElementById('add-note-btn');
 const logoutBtn = document.getElementById('logout-btn');
@@ -91,7 +91,7 @@ loadDocuments();
 
 async function createNewNote() {
   try {
-    const res = await fetch(`${API_BASE}/documents`, {
+    const res = await fetch(`${API_BASE}/api/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -126,7 +126,7 @@ if (addNoteBtn) {
 if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {
     try {
-      await fetch(`${API_BASE}/logout`, {
+      await fetch(`${API_BASE}/api/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -142,7 +142,7 @@ const detailCache = new Map();
 
 async function fetchDocDetail(id) {
   if (detailCache.has(id)) return detailCache.get(id);
-  const res = await fetch(`${API_BASE}/documents/${id}`, { credentials: 'include', cache: 'no-store' });
+  const res = await fetch(`${API_BASE}/api/documents/${id}`, { credentials: 'include', cache: 'no-store' });
   if (!res.ok) throw new Error('No se pudo obtener documento');
   const data = await res.json();
   detailCache.set(id, data);
