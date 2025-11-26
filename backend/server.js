@@ -4,6 +4,9 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
 
+// Force-disable TLS cert validation for outbound connections (last resort for self-signed errors).
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const app = express();
 
 // Use only the public DB URL.
