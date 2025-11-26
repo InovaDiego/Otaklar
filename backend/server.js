@@ -6,11 +6,11 @@ const path = require('path');
 
 const app = express();
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is not set');
+// Prefer an explicit private/VPC URL if provided; otherwise use DATABASE_URL.
+const DATABASE_URL = process.env.PRIVATE_DATABASE_URL || process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL (or PRIVATE_DATABASE_URL) environment variable is not set');
 }
-
-const DATABASE_URL = process.env.DATABASE_URL;
 
 // If PG_SSL_CA is provided, validate against that CA; otherwise allow self-signed.
 const sslConfig = process.env.PG_SSL_CA
