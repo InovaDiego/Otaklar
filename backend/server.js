@@ -7,11 +7,11 @@ const path = require('path');
 const app = express();
 
 const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'Otaklar',
-  user: 'admin',
-  password: 'diplomado23',
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    require: true,
+    rejectUnauthorized: false
+  }
 });
 
 async function runQuery(queryText, params = []) {
