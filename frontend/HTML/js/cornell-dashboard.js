@@ -1,4 +1,4 @@
-const API_BASE = `${window.location.protocol}//${window.location.hostname}:3030`;
+const API_BASE = "/api";
 const grid = document.getElementById('notes-grid');
 const addNoteBtn = document.getElementById('add-note-btn');
 const logoutBtn = document.getElementById('logout-btn');
@@ -59,7 +59,7 @@ function buildCard(doc) {
 
 async function loadDocuments() {
   try {
-    const res = await fetch(`${API_BASE}/api/documents`, { credentials: 'include', cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/documents`, { credentials: 'include', cache: 'no-store' });
 
     if (res.status === 401) {
       window.location.href = './login.html';
@@ -91,7 +91,7 @@ loadDocuments();
 
 async function createNewNote() {
   try {
-    const res = await fetch(`${API_BASE}/api/documents`, {
+    const res = await fetch(`${API_BASE}/documents`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -126,7 +126,7 @@ if (addNoteBtn) {
 if (logoutBtn) {
   logoutBtn.addEventListener('click', async () => {
     try {
-      await fetch(`${API_BASE}/api/logout`, {
+      await fetch(`${API_BASE}/logout`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -142,7 +142,7 @@ const detailCache = new Map();
 
 async function fetchDocDetail(id) {
   if (detailCache.has(id)) return detailCache.get(id);
-  const res = await fetch(`${API_BASE}/api/documents/${id}`, { credentials: 'include', cache: 'no-store' });
+  const res = await fetch(`${API_BASE}/documents/${id}`, { credentials: 'include', cache: 'no-store' });
   if (!res.ok) throw new Error('No se pudo obtener documento');
   const data = await res.json();
   detailCache.set(id, data);

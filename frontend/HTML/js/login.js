@@ -1,4 +1,4 @@
-const API_BASE = `${window.location.protocol}//${window.location.hostname}:3030`;
+const API_BASE = "/api";
 const form = document.querySelector('.register-card');
 const lgAlert = document.getElementById('login-alert');
 
@@ -8,7 +8,7 @@ form.addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
 
   try {
-    const res = await fetch(`${API_BASE}/api/login`, {
+    const res = await fetch(`${API_BASE}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
