@@ -6,7 +6,10 @@ const path = require('path');
 
 const app = express();
 
-// Use env var when provided; fall back to the public DB endpoint shared by the user.
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
 const DATABASE_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
