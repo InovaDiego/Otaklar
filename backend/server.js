@@ -14,10 +14,11 @@ const DATABASE_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
+  // DigitalOcean managed Postgres presents a self-signed cert; disable verification.
   ssl: {
-    require: true,
-    rejectUnauthorized: false
-  }
+    ca: process.env.PG_SSL_CA,
+    rejectUnauthorized: false,
+  },
 });
 
 async function runQuery(queryText, params = []) {
