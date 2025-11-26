@@ -7,8 +7,7 @@ const path = require('path');
 const app = express();
 
 // Use env var when provided; fall back to the public DB endpoint shared by the user.
-const DATABASE_URL =
-  process.env.DATABASE_URL;
+const DATABASE_URL = process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
