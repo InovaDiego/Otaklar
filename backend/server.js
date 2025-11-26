@@ -19,7 +19,14 @@ async function runQuery(queryText, params = []) {
   return result.rows;
 }
 
-app.use(cors({ origin: true, credentials: true }));
+
+const FRONTEND_ORIGIN = "https://otaklar-frontend-tt6ru.ondigitalocean.app";
+
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use(
   session({
@@ -28,7 +35,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none',
+      secure: true,
       maxAge: 1000 * 60 * 60,
     },
   }),
