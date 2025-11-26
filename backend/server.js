@@ -12,17 +12,8 @@ if (!DATABASE_URL) {
   throw new Error('DATABASE_URL environment variable is not set');
 }
 
-// Control SSL validation:
-// - Default: allow self-signed (rejectUnauthorized: false) to avoid blocking on DO's certs.
-// - If DB_SSL_STRICT=true and PG_SSL_CA is provided, validate against that CA.
-const sslStrict = process.env.DB_SSL_STRICT === 'true';
-const sslConfig =
-  sslStrict && process.env.PG_SSL_CA
-    ? {
-        ca: process.env.PG_SSL_CA.replace(/\\n/g, '\n'),
-        rejectUnauthorized: true,
-      }
-    : { rejectUnauthorized: false };
+// Always allow self-signed (disable strict validation) to avoid cert issues.
+const sslConfig = { rejectUnauthorized: false };
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
