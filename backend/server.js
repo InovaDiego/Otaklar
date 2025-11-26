@@ -8,8 +8,7 @@ const app = express();
 
 // Use env var when provided; fall back to the public DB endpoint shared by the user.
 const DATABASE_URL =
-  process.env.DATABASE_URL ||
-  'postgres://doadmin:AVNS_ptHeQ30vvQ1B37xrsCb@otaklar-db-do-user-22829578-0.g.db.ondigitalocean.com:25060/defaultdb?sslmode=require';
+  process.env.DATABASE_URL;
 
 const pool = new Pool({
   connectionString: DATABASE_URL,
