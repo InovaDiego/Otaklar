@@ -1,4 +1,7 @@
-const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
+const API_BASE = window.BACKEND_ORIGIN;
+if (!API_BASE) {
+  throw new Error('BACKEND_ORIGIN environment variable is not set');
+}
 const grid = document.getElementById('notes-grid');
 const addNoteBtn = document.getElementById('add-note-btn');
 const logoutBtn = document.getElementById('logout-btn');

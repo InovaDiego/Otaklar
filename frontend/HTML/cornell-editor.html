@@ -214,6 +214,7 @@ https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css
     <script src="
 https://cdn.rawgit.com/kensnyder/quill-image-resize-module/3411c9a7/image-resize.min.js
 "></script>
+    <script src="/config.js"></script>
     <script>
         const icons = Quill.import('ui/icons');
 
@@ -278,7 +279,10 @@ https://cdn.rawgit.com/kensnyder/quill-image-resize-module/3411c9a7/image-resize
     </script>
     <script>
         //This script is for uploading the contents of the front-end cornell notes template to the backend
-        const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
+        const API_BASE = window.BACKEND_ORIGIN;
+        if (!API_BASE) {
+            throw new Error('BACKEND_ORIGIN environment variable is not set');
+        }
         const save = document.getElementById('save-btn');
         const backBtn = document.getElementById('back-btn');
         const docTitle = document.getElementById('doc-title');

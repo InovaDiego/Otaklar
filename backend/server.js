@@ -29,9 +29,18 @@ async function runQuery(queryText, params = []) {
 }
 
 
-const FRONTEND_ORIGIN =
-  process.env.FRONTEND_ORIGIN ||
-  "https://otaklar-frontend-tt6ru.ondigitalocean.app";
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
+if (!FRONTEND_ORIGIN) {
+  throw new Error('FRONTEND_ORIGIN environment variable is not set');
+}
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable is not set');
+}
+const BACKEND_ORIGIN = process.env.BACKEND_ORIGIN;
+if (!BACKEND_ORIGIN) {
+  throw new Error('BACKEND_ORIGIN environment variable is not set');
+}
 const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(cors({
@@ -43,7 +52,7 @@ app.set('trust proxy', 1);
 app.use(express.json());
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -235,7 +244,16 @@ app.put('/api/documents/:id', requireAuth, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3030;
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+app.get('/config.js', (req, res) => {
+  res.type('application/javascript').send(
+    `window.BACKEND_ORIGIN = ${JSON.stringify(BACKEND_ORIGIN)};`
+  );
+});
+
+const PORT = process.env.PORT;
+if (!PORT) {
+  throw new Error('PORT environment variable is not set');
+}
+app.listen(Number(PORT), () => {
+  console.log(`Servidor ejecutandose en http://localhost:${PORT}`);
 });
