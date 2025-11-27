@@ -1,7 +1,4 @@
-const API_BASE = window.BACKEND_ORIGIN;
-if (!API_BASE) {
-  throw new Error('BACKEND_ORIGIN environment variable is not set');
-}
+const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
 const form = document.querySelector('.register-card');
 const lgAlert = document.getElementById('login-alert');
 

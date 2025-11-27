@@ -37,10 +37,6 @@ const SESSION_SECRET = process.env.SESSION_SECRET;
 if (!SESSION_SECRET) {
   throw new Error('SESSION_SECRET environment variable is not set');
 }
-const BACKEND_ORIGIN = process.env.BACKEND_ORIGIN;
-if (!BACKEND_ORIGIN) {
-  throw new Error('BACKEND_ORIGIN environment variable is not set');
-}
 const isProduction = process.env.NODE_ENV === 'production';
 
 app.use(cors({
@@ -242,12 +238,6 @@ app.put('/api/documents/:id', requireAuth, async (req, res) => {
     console.error(err);
     res.status(500).json({ error: 'Error al actualizar documento', detalle: err.message });
   }
-});
-
-app.get('/config.js', (req, res) => {
-  res.type('application/javascript').send(
-    `window.BACKEND_ORIGIN = ${JSON.stringify(BACKEND_ORIGIN)};`
-  );
 });
 
 const PORT = process.env.PORT;
