@@ -1,4 +1,4 @@
-const API_BASE = `${window.location.protocol}//${window.location.hostname}:3030`;
+const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
 const form = document.querySelector('.register-card');
 const lgAlert = document.getElementById('login-alert');
 

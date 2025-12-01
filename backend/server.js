@@ -4,14 +4,23 @@ const cors = require('cors');
 const { Pool } = require('pg');
 const path = require('path');
 
+// Force-disable TLS cert validation for outbound connections (last resort for self-signed errors).
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const app = express();
 
+// Use only the public DB URL.
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL environment variable is not set');
+}
+
+// Always allow self-signed (disable strict validation) to avoid cert issues.
+const sslConfig = { rejectUnauthorized: false };
+
 const pool = new Pool({
-  host: 'localhost',
-  port: 5432,
-  database: 'Otaklar',
-  user: 'admin',
-  password: 'diplomado23',
+  connectionString: DATABASE_URL,
+  ssl: sslConfig,
 });
 
 async function runQuery(queryText, params = []) {
@@ -19,16 +28,33 @@ async function runQuery(queryText, params = []) {
   return result.rows;
 }
 
-app.use(cors({ origin: true, credentials: true }));
+
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN;
+if (!FRONTEND_ORIGIN) {
+  throw new Error('FRONTEND_ORIGIN environment variable is not set');
+}
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET) {
+  throw new Error('SESSION_SECRET environment variable is not set');
+}
+const isProduction = process.env.NODE_ENV === 'production';
+
+app.use(cors({
+  origin: FRONTEND_ORIGIN,
+  credentials: true,
+}));
+
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(
   session({
-    secret: 'super-secret-key',
+    secret: SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
       maxAge: 1000 * 60 * 60,
     },
   }),
@@ -214,7 +240,10 @@ app.put('/api/documents/:id', requireAuth, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3030;
-app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
+const PORT = process.env.PORT;
+if (!PORT) {
+  throw new Error('PORT environment variable is not set');
+}
+app.listen(Number(PORT), () => {
+  console.log(`Servidor ejecutandose en http://localhost:${PORT}`);
 });

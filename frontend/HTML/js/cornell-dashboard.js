@@ -1,4 +1,4 @@
-const API_BASE = `${window.location.protocol}//${window.location.hostname}:3030`;
+const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
 const grid = document.getElementById('notes-grid');
 const addNoteBtn = document.getElementById('add-note-btn');
 const logoutBtn = document.getElementById('logout-btn');
