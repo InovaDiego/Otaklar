@@ -42,13 +42,15 @@
                 aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="mainNav">
+                        <div class="collapse navbar-collapse" id="mainNav">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item d-flex align-items-center me-2">
+                        <span class="nav-link" id="user-name"></span>
+                    </li>
                     <li class="nav-item"><a class="nav-link" href="./cornell-dashboard.html">Dashboard Cornell</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Cerrar sesión</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="logout-btn">Cerrar sesión</a></li>
                 </ul>
-            </div>
-        </div>
+            </div>        </div>
     </nav>
     <div class="container-fluid py-5 d-flex flex-column justify-content-center align-items-center">
         <iframe width="778" height="438" src="https://www.youtube.com/embed/HUdA6LdCRk8"
@@ -140,10 +142,51 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 
-    <script>
-        // Año dinámico del pie
-        document.getElementById('year').textContent = new Date().getFullYear();
+                <script>
+        const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
+        const logoutBtn = document.getElementById('logout-btn');
+        const userName = document.getElementById('user-name');
 
+        async function ensureSession() {
+            try {
+                const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include', cache: 'no-store' });
+                if (res.status === 401) {
+                    window.location.href = './login.html';
+                    return;
+                }
+                if (!res.ok) {
+                    console.error('No se pudo validar sesiA3n');
+                    return;
+                }
+                const user = await res.json();
+                if (userName) {
+                    userName.textContent = user.nombre ? `Hola, ${user.nombre}` : (user.email || '');
+                }
+            } catch (err) {
+                console.error('Error al verificar sesiA3n', err);
+                window.location.href = './login.html';
+            }
+        }
+
+        async function handleLogout(event) {
+            event.preventDefault();
+            try {
+                await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' });
+            } catch (err) {
+                console.error('No se pudo cerrar sesiA3n', err);
+            } finally {
+                window.location.href = './login.html';
+            }
+        }
+
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', handleLogout);
+        }
+
+        ensureSession();
+
+        // Anio dinamico del pie
+        document.getElementById('year').textContent = new Date().getFullYear();
         // Manejo y validación de todos los formularios de actividad
         const toastEl = document.getElementById('toastOk');
         const toast = toastEl ? new bootstrap.Toast(toastEl) : null;
@@ -194,3 +237,9 @@
 </body>
 
 </html>
+
+
+
+
+
+
