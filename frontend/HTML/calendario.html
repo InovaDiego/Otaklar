@@ -1,278 +1,397 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Calendario Navegable (Fecha Actual)</title>
-<style>
-  :root{
-    --accent:#6d8cff;
-    --bg:#f6f7fb;
-    --card:#eef1ff;
-  }
-
-  body{
-    margin:0;
-    font-family: Arial, Helvetica, sans-serif;
-    background:var(--bg);
-    color:#222;
-  }
-
-  header{
-    background:var(--accent);
-    color:#fff;
-    padding:18px 12px;
-    text-align:center;
-    font-weight:700;
-    font-size:1.25rem;
-  }
-
-  .container{
-    max-width:1100px;
-    margin:26px auto;
-    background:#fff;
-    padding:18px;
-    border-radius:12px;
-    box-shadow:0 6px 20px rgba(0,0,0,0.08);
-  }
-
-  .nav{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    margin-bottom:12px;
-  }
-
-  .nav button{
-    background:var(--accent);
-    color:#fff;
-    border:none;
-    padding:10px 14px;
-    border-radius:10px;
-    cursor:pointer;
-    font-weight:600;
-  }
-
-  #monthTitle{
-    font-size:1.15rem;
-    font-weight:700;
-    text-align:center;
-    flex:1;
-  }
-
-  /* días de la semana (cabecera) */
-  .weekdays{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:10px;
-    margin-bottom:8px;
-  }
-
-  .weekday{
-    text-align:center;
-    padding:8px 0;
-    background:#e9ecff;
-    border-radius:8px;
-    font-weight:700;
-  }
-
-  /* calendario */
-  .calendar{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:10px;
-  }
-
-  .day{
-    background:var(--card);
-    min-height:110px;
-    padding:10px;
-    border-radius:10px;
-    position:relative;
-    overflow:auto;
-  }
-
-  .day .num{
-    font-weight:700;
-  }
-
-  .day.today{
-    box-shadow:0 0 0 3px rgba(109,140,255,0.12);
-    border:2px solid rgba(109,140,255,0.18);
-  }
-
-  .event{
-    display:block;
-    margin-top:8px;
-    padding:6px 8px;
-    background:var(--accent);
-    color:#fff;
-    border-radius:8px;
-    text-decoration:none;
-    font-size:0.85rem;
-  }
-
-  /* celdas vacías para los primeros días */
-  .empty{
-    background:transparent;
-    border-radius:8px;
-  }
-
-  /* responsive */
-  @media (max-width:720px){
-    .day{ min-height:90px; padding:8px; }
-    header{ font-size:1rem; }
-  }
-</style>
-</head>
-<body>
-
-<header>Calendario de Reuniones</header>
-
-<div class="container">
-  <div class="nav">
-    <button onclick="prevMonth()">◀ Mes anterior</button>
-    <div id="monthTitle"></div>
-    <button onclick="nextMonth()">Mes siguiente ▶</button>
-  </div>
-
-  <div class="weekdays" id="weekdaysHeader">
-    <!-- Se llenan desde JS -->
-  </div>
-
-  <div class="calendar" id="calendarGrid">
-    <!-- Celdas generadas por JS -->
-  </div>
-</div>
-
-<script>
-  // estado actual (mes y año dinámicos)
-  let today = new Date();
-  let displayMonth = today.getMonth(); // 0..11
-  let displayYear  = today.getFullYear();
-
-  const monthNames = ["Enero","Febrero","Marzo","Abril","Mayo","Junio",
-                      "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-  const monthDays = [31, ( (displayYear%4===0 && displayYear%100!==0) || (displayYear%400===0) ) ? 29 : 28, 31,30,31,30,31,31,30,31,30,31];
-  const weekdays = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"]; // empieza lunes
-
-  // Eventos por mesIndex (0=enero,...)
-  const events = {
-    9: [ // Octubre (index 9)
-      {day:5,  text:"Evento Octubre A", url:"https://otaklar.com/octA"},
-      {day:22, text:"Evento Octubre B", url:"https://otaklar.com/octB"}
-    ],
-    10: [ // Noviembre (index 10)
-      {day:4,  text:"Tarea Noviembre A", url:"https://otaklar.com/novA"},
-      {day:18, text:"Tarea Noviembre B", url:"https://otaklar.com/novB"}
-    ],
-    11: [ // Diciembre (index 11)
-      {day:3,  text:"Evento Diciembre A", url:"https://otaklar.com/dicA"},
-      {day:15, text:"Evento Diciembre B", url:"https://otaklar.com/dicB"}
-    ]
-  };
-
-  // genera cabecera con dias de la semana
-  function renderWeekdays(){
-    const head = document.getElementById('weekdaysHeader');
-    head.innerHTML = '';
-    weekdays.forEach(w => {
-      const d = document.createElement('div');
-      d.className = 'weekday';
-      d.textContent = w;
-      head.appendChild(d);
-    });
-  }
-
-  // función principal para renderizar el mes en pantalla
-  function renderMonth(){
-    const grid = document.getElementById('calendarGrid');
-    const title = document.getElementById('monthTitle');
-
-    // recalcular días de febrero por si cambia el año
-    const febDays = ( (displayYear%4===0 && displayYear%100!==0) || (displayYear%400===0) ) ? 29 : 28;
-    const daysPerMonth = [31, febDays,31,30,31,30,31,31,30,31,30,31];
-
-    grid.innerHTML = '';
-    title.textContent = `${monthNames[displayMonth]} ${displayYear}`;
-
-    // primer día del mes (0 = domingo, 1 = lunes,...)
-    const firstDayJS = new Date(displayYear, displayMonth, 1).getDay(); // 0..6 (sun..sat)
-    // convertimos a índice donde 0 = lunes. Fórmula: (firstDayJS + 6) % 7
-    const blanks = (firstDayJS + 6) % 7; // número de celdas vacías antes del dia 1
-
-    // crear blanks
-    for(let i=0;i<blanks;i++){
-      const e = document.createElement('div');
-      e.className = 'empty';
-      grid.appendChild(e);
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+  <title>Calendario Navegable (Fecha Actual)</title>
+  <style>
+    :root {
+      --accent: #6d8cff;
+      --bg: #f6f7fb;
+      --card: #eef1ff;
     }
 
-    // crear días
-    const total = daysPerMonth[displayMonth];
-    for(let d=1; d<=total; d++){
-      const cell = document.createElement('div');
-      cell.className = 'day';
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: #222;
+    }
 
-      // número del día
-      const num = document.createElement('div');
-      num.className = 'num';
-      num.textContent = d;
-      cell.appendChild(num);
+    header {
+      background: var(--accent);
+      color: #fff;
+      padding: 18px 12px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
 
-      // si es hoy (mismo día, mes y año) resaltarlo
-      if (d === today.getDate() && displayMonth === today.getMonth() && displayYear === today.getFullYear()){
-        cell.classList.add('today');
+    .container {
+      max-width: 1100px;
+      margin: 26px auto;
+      background: #fff;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .nav button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #monthTitle {
+      font-size: 1.15rem;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
+    }
+
+    /* días de la semana (cabecera) */
+    .weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .weekday {
+      text-align: center;
+      padding: 8px 0;
+      background: #e9ecff;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+
+    /* calendario */
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .day {
+      background: var(--card);
+      min-height: 110px;
+      padding: 10px;
+      border-radius: 10px;
+      position: relative;
+      overflow: auto;
+    }
+
+    .day .num {
+      font-weight: 700;
+    }
+
+    .day.today {
+      box-shadow: 0 0 0 3px rgba(109, 140, 255, 0.12);
+      border: 2px solid rgba(109, 140, 255, 0.18);
+    }
+
+    .event {
+      display: block;
+      margin-top: 8px;
+      padding: 6px 8px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    /* celdas vacías para los primeros días */
+    .empty {
+      background: transparent;
+      border-radius: 8px;
+    }
+
+    /* responsive */
+    @media (max-width:720px) {
+      .day {
+        min-height: 90px;
+        padding: 8px;
       }
 
-      // agregar eventos si existen para este mes
-      const monthEvents = events[displayMonth] || [];
-      monthEvents.forEach(ev => {
-        if (ev.day === d){
-          const a = document.createElement('a');
-          a.className = 'event';
-          a.href = ev.url;
-          a.target = '_blank';
-          a.textContent = ev.text;
-          cell.appendChild(a);
+      header {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="./index.html">Calendario de actividades</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item d-flex align-items-center me-2">
+            <span class="nav-link" id="user-name"></span>
+          </li>
+          <li class="nav-item"><a class="nav-link" href="./cornell-dashboard.html">Dashboard Cornell</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" id="logout-btn">Cerrar sesión</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="nav">
+      <button onclick="prevMonth()">◀ Mes anterior</button>
+      <div id="monthTitle"></div>
+      <button onclick="nextMonth()">Mes siguiente ▶</button>
+    </div>
+
+    <div class="weekdays" id="weekdaysHeader">
+      <!-- Se llenan desde JS -->
+    </div>
+
+    <div class="calendar" id="calendarGrid">
+      <!-- Celdas generadas por JS -->
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    crossorigin="anonymous"></script>
+  <script>
+    // estado actual (mes y año dinámicos)
+    let today = new Date();
+    let displayMonth = today.getMonth(); // 0..11
+    let displayYear = today.getFullYear();
+
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const monthDays = [31, ((displayYear % 4 === 0 && displayYear % 100 !== 0) || (displayYear % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const weekdays = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]; // empieza lunes
+
+    // Eventos por mesIndex (0=enero,...)
+    const events = {
+      9: [ // Octubre (index 9)
+        { day: 5, text: "Evento Octubre A", url: "https://otaklar.com/octA" },
+        { day: 22, text: "Evento Octubre B", url: "https://otaklar.com/octB" }
+      ],
+      10: [ // Noviembre (index 10)
+        { day: 4, text: "Tarea Noviembre A", url: "https://otaklar.com/novA" },
+        { day: 18, text: "Tarea Noviembre B", url: "https://otaklar.com/novB" }
+      ],
+      11: [ // Diciembre (index 11)
+        { day: 3, text: "Evento Diciembre A", url: "https://otaklar.com/dicA" },
+        { day: 15, text: "Evento Diciembre B", url: "https://otaklar.com/dicB" }
+      ]
+    };
+
+    // genera cabecera con dias de la semana
+    function renderWeekdays() {
+      const head = document.getElementById('weekdaysHeader');
+      head.innerHTML = '';
+      weekdays.forEach(w => {
+        const d = document.createElement('div');
+        d.className = 'weekday';
+        d.textContent = w;
+        head.appendChild(d);
+      });
+    }
+
+    // función principal para renderizar el mes en pantalla
+    function renderMonth() {
+      const grid = document.getElementById('calendarGrid');
+      const title = document.getElementById('monthTitle');
+
+      // recalcular días de febrero por si cambia el año
+      const febDays = ((displayYear % 4 === 0 && displayYear % 100 !== 0) || (displayYear % 400 === 0)) ? 29 : 28;
+      const daysPerMonth = [31, febDays, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+      grid.innerHTML = '';
+      title.textContent = `${monthNames[displayMonth]} ${displayYear}`;
+
+      // primer día del mes (0 = domingo, 1 = lunes,...)
+      const firstDayJS = new Date(displayYear, displayMonth, 1).getDay(); // 0..6 (sun..sat)
+      // convertimos a índice donde 0 = lunes. Fórmula: (firstDayJS + 6) % 7
+      const blanks = (firstDayJS + 6) % 7; // número de celdas vacías antes del dia 1
+
+      // crear blanks
+      for (let i = 0; i < blanks; i++) {
+        const e = document.createElement('div');
+        e.className = 'empty';
+        grid.appendChild(e);
+      }
+
+      // crear días
+      const total = daysPerMonth[displayMonth];
+      for (let d = 1; d <= total; d++) {
+        const cell = document.createElement('div');
+        cell.className = 'day';
+
+        // número del día
+        const num = document.createElement('div');
+        num.className = 'num';
+        num.textContent = d;
+        cell.appendChild(num);
+
+        // si es hoy (mismo día, mes y año) resaltarlo
+        if (d === today.getDate() && displayMonth === today.getMonth() && displayYear === today.getFullYear()) {
+          cell.classList.add('today');
         }
+
+        // agregar eventos si existen para este mes
+        const monthEvents = events[displayMonth] || [];
+        monthEvents.forEach(ev => {
+          if (ev.day === d) {
+            const a = document.createElement('a');
+            a.className = 'event';
+            a.href = ev.url;
+            a.target = '_blank';
+            a.textContent = ev.text;
+            cell.appendChild(a);
+          }
+        });
+
+        // click sobre el día lleva a actividad.html con params
+        cell.addEventListener('click', (e) => {
+          // si se cliqueó un link de evento, dejar que abra el link (no redirigir)
+          if (e.target && e.target.tagName.toLowerCase() === 'a') return;
+          const params = `?dia=${d}&mes=${displayMonth + 1}&anio=${displayYear}`;
+          window.location.href = 'actividad.html' + params;
+        });
+
+        grid.appendChild(cell);
+      }
+    }
+
+    function nextMonth() {
+      displayMonth++;
+      if (displayMonth > 11) {
+        displayMonth = 0;
+        displayYear++;
+      }
+      renderMonth();
+    }
+
+    function prevMonth() {
+      displayMonth--;
+      if (displayMonth < 0) {
+        displayMonth = 11;
+        displayYear--;
+      }
+      renderMonth();
+    }
+
+    // inicializar
+    renderWeekdays();
+    renderMonth();
+  </script>
+  <script>
+    const API_BASE = "https://otaklar-backend-czh69.ondigitalocean.app";
+    const logoutBtn = document.getElementById('logout-btn');
+    const userName = document.getElementById('user-name');
+
+    async function ensureSession() {
+      try {
+        const res = await fetch(`${API_BASE}/api/me`, { credentials: 'include', cache: 'no-store' });
+        if (res.status === 401) {
+          window.location.href = './login.html';
+          return;
+        }
+        if (!res.ok) {
+          console.error('No se pudo validar sesiA3n');
+          return;
+        }
+        const user = await res.json();
+        if (userName) {
+          userName.textContent = user.nombre ? `Hola, ${user.nombre}` : (user.email || '');
+        }
+      } catch (err) {
+        console.error('Error al verificar sesiA3n', err);
+        window.location.href = './login.html';
+      }
+    }
+
+    async function handleLogout(event) {
+      event.preventDefault();
+      try {
+        await fetch(`${API_BASE}/api/logout`, { method: 'POST', credentials: 'include' });
+      } catch (err) {
+        console.error('No se pudo cerrar sesiA3n', err);
+      } finally {
+        window.location.href = './login.html';
+      }
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', handleLogout);
+    }
+
+    ensureSession();
+
+    // Anio dinamico del pie
+    document.getElementById('year').textContent = new Date().getFullYear();
+    // Manejo y validación de todos los formularios de actividad
+    const toastEl = document.getElementById('toastOk');
+    const toast = toastEl ? new bootstrap.Toast(toastEl) : null;
+
+    document.querySelectorAll('.activity-form').forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        // Validación nativa + estilos Bootstrap
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+          form.classList.add('was-validated');
+          return;
+        }
+        event.preventDefault();
+        // En un sistema real aquí iría el fetch() al backend.
+        const resetButton = form.querySelector('button[type="reset"]');
+        if (resetButton) {
+          resetButton.click();
+        } else {
+          form.reset();
+          form.classList.remove('was-validated');
+        }
+        // Colapsar la sección del formulario tras enviar
+        const collapseEl = form.closest('.card').querySelector('.collapse');
+        if (collapseEl) {
+          const c = bootstrap.Collapse.getOrCreateInstance(collapseEl);
+          c.hide();
+        }
+        // Mostrar confirmación
+        if (toast) toast.show();
       });
 
-      // click sobre el día lleva a actividad.html con params
-      cell.addEventListener('click', (e) => {
-        // si se cliqueó un link de evento, dejar que abra el link (no redirigir)
-        if (e.target && e.target.tagName.toLowerCase() === 'a') return;
-        const params = `?dia=${d}&mes=${displayMonth+1}&anio=${displayYear}`;
-        window.location.href = 'actividad.html' + params;
+      // Limpiar estilos de validación al hacer reset
+      form.addEventListener('reset', () => {
+        form.classList.remove('was-validated');
       });
+    });
 
-      grid.appendChild(cell);
+    // Acceso por URL directa con hash (p.ej., /actividades#formAct3)
+    if (location.hash) {
+      const target = document.querySelector(location.hash);
+      if (target && target.classList.contains('collapse')) {
+        bootstrap.Collapse.getOrCreateInstance(target).show();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
-  }
-
-  function nextMonth(){
-    displayMonth++;
-    if (displayMonth > 11){
-      displayMonth = 0;
-      displayYear++;
-    }
-    renderMonth();
-  }
-
-  function prevMonth(){
-    displayMonth--;
-    if (displayMonth < 0){
-      displayMonth = 11;
-      displayYear--;
-    }
-    renderMonth();
-  }
-
-  // inicializar
-  renderWeekdays();
-  renderMonth();
-</script>
-
+  </script>
 </body>
+
 </html>
